@@ -1,5 +1,7 @@
 <template>
-	<div class="body">
+<div style="position:relative;">
+  <div style="text-align:center;position:absolute;top:20px;width:100%;color:#ccc;">还没有任何消息</div>
+	<div class="body" style="position:relative;z-index:10;background-color:#fff;">
 		<div class="replay" v-for="item in list" @click="tiao(item.wid)">
 			<div class="img">
 				<img :src="item.headimg" class="left">
@@ -15,6 +17,7 @@
 			</div>
 		</div>
 	</div>
+</div>
 </template>
 <script>
 import storage from '../modle/storange.js'
@@ -83,7 +86,7 @@ export default {
 </script>
 <style scoped>
 .body{
-	background-color: #F3F3F5;
+	/*background-color: #F3F3F5;*/
 	margin:15px;
 	padding-left:10px;
 	padding-right:10px;
@@ -92,7 +95,7 @@ export default {
 .replay{
 	display: flex;
 	padding-top:10px;
-	padding-bottom:15px;
+	padding-bottom:20px;
 	box-sizing: border-box;
 	border-bottom:1px solid #CFCFD0;
 	
@@ -113,6 +116,9 @@ export default {
 }
 .right-top{
 	color:#808080;
+}
+.name{
+  color: #576b95;
 }
 
 .time{

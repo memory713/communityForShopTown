@@ -1,5 +1,5 @@
 <template>
-	<div  style="position:relative;">
+	<div  style="position:relative;" class="body"  >
       <div class="gudong">
       <div class="shuaxin" @click="shuaxin()" >
        <img src="../assets/shuaxin.png">
@@ -9,14 +9,24 @@
         </div>
         
       </div>
-      <div class="mengcengImg" v-show="mengcengImgT" @touchend="xiaoshi()" @touchstart="jishi()">
-        <img :src="mengcengImg"><span></span>  
-      </div>
+      <v-touch v-on:tap="jishi()">
+      <div class="mengcengImg" v-show="mengcengImgT" @touchmove.prevent >
+        <mt-swipe :auto="0" style="height:100%;">
+          <mt-swipe-item v-for="item in lunboSrc" class="mengcengImgnei">
+              <img :src="item"><span></span>
+          </mt-swipe-item>
+        </mt-swipe>
+      <!--   <img :src="mengcengImg"><span></span>   -->
+      </div></v-touch>
+
+
+
+
 	    <div class="bgc">
 	      <div class="user" @click="headChange()">
-	        <div class="user-name" @click="getData()" style="color:#000;">{{nickname}}</div>
-	        <div class="user-img">
-	          <img :src="headimgZ" :onerror="logo">
+	        <div class="user-name" @click="getData()" style="color: rgb(0,0, 0);font-weight: 550;">{{nickname}}</div>
+	        <div class="user-img" >
+	          <img :src="headimgZ" :onerror="logo" style="box-shadow: 0px 0px 6px 0px rgba(0, 0, 0, 0.4);">
 	        </div>
 	      </div>
 	    </div>
@@ -40,9 +50,9 @@
           </div>
           <div class="box-right" >
             <div class="ditail-name">{{item.nickname}}</div>
-            <div style="margin-bottom: 10px;">{{item.content}}</div>
+            <div style="margin-bottom: 10px;" @click="pinglun(item.id)">{{item.content}}</div>
             <div class="shaitu" style="width:100%;"  >
-              <img :src='item2+"?imageView2/1/w/150/h/150/q/75|imageslim"' v-lazy="item2" v-for="item2 in item.images" v-bind:style="{ height: item.item2Height+ 'px', width: item.item2Width + 'px' }" class="item2Imgp" :onerror="logo" @click="tiaozhuanfangda(item2)">
+              <img :src='item2+"?imageView2/1/w/150/h/150/q/75|imageslim"' v-lazy="item2" v-for="item2 in item.images" v-bind:style="{ height: item.item2Height+ 'px', width: item.item2Width + 'px' }" class="item2Imgp" :onerror="logo" @click="tiaozhuanfangda(item.images)">
             </div>
             <div class="ditail-bottom">
               <div class="ditail-bottom-left">{{item.weibotype}}</div>
@@ -55,13 +65,26 @@
                   <img :src="item.iszan" class="ditail-icon" @click="dianzan(item.id,index)">
                   <div>{{item.zan}}</div>
                 </div>
-                <div class="ditail-bottom-icon">
-                  <img src="../assets/huifu.png" class="ditail-icon" @click="pinglun(item.id)">
+                <div class="ditail-bottom-icon" @click="pinglun(item.id)">
+                  <img src="../assets/huifu.png" class="ditail-icon" >
                   <div>{{item.pinglun}}</div>
+                </div>
+              </div>
+              
+          </div>
+<!-- 评论 -->
+          <div v-show="item.replayListNone" style="padding: 8px;background-color: #F0F0F0;margin-top:5px;font-size:0.68rem;">
+            <div class="replay-line" v-for="item3 in item.replylist" >
+              <div style="display:flex;justify-content:space-between;width:100%;">
+                <div>
+                  <span class="name-color" >{{item3.nickname}}</span> <span v-show="item3.replynickname" >回复 <span class="name-color">{{item3.replynickname}}</span></span>：<span>{{item3.content}}</span>
                 </div>
               </div>
             </div>
           </div>
+
+
+
         </div>
       </div>
       </div>
@@ -70,7 +93,7 @@
         <div>加载中...</div>
       </div>
       <div v-show="loading" style="width:100%;height:50px;line-height:50px;text-align:center;color:#ccc;">没有更多信息了</div>
-
+</div>
 	</div>
 </template>
 <script>
@@ -93,6 +116,7 @@ export default {
         id:1,
         loading: false,
         mengcengImgT:false,
+        lunboSrc:[],
         page:1,
         logo:"this.src='../static/app.png'",
         item2Height:50,
@@ -104,12 +128,38 @@ export default {
         messageHeadimg:'../static/app.png',
         jishinum:0,
         isActive0:true,
-        numWaiting:true
+        numWaiting:true,
+        replayList:[]
         // iszan:"../static/zan.png"
         // loading2:true
       }
   },
   mounted(){     /*请求数据，操作dom , 放在这个里面  mounted*/
+  
+ this.lifeBegin()
+
+  },
+  beforeDestroy () {
+      clearInterval(this.interval)
+     
+    },
+  methods:{
+
+    lifeBegin(){
+
+          // http://sq.emjiayuan.com/#/Home?userid=1&token=abc&app=1
+    var useridNew = this.$route.query.userid
+    var token = this.$route.query.token
+    var app = this.$route.query.app
+    if((useridNew == undefined)||(useridNew == null)||(useridNew == "")){
+      storage.set("app",2)
+    }else{
+      storage.set("userId",useridNew)
+      storage.set("newkey",token)
+      storage.set("app",1)
+    }
+
+
     var that = this
      var userId = storage.get("userId")
     if(userId!==null){
@@ -179,6 +229,7 @@ export default {
     {
       params: {},
       success: function (res) {
+
         // that.typeList = res.data
         for (var i = 0; i < res.data.length; i++) {
           var msg = []
@@ -202,12 +253,7 @@ export default {
     // 获取用户名和头像昵称
 
 
-  },
-  beforeDestroy () {
-      clearInterval(this.interval)
-     
     },
-  methods:{
     dingshishuaWEB(){
           var that = this
 
@@ -227,6 +273,7 @@ if(userId!==null){
           
         },
         success: function (res) {
+
           that.numWaiting = true
           that.numMessage = res.data.num
           if(that.numMessage!=="0"){
@@ -261,6 +308,7 @@ if(userId!==null){
       this.$router.push({path:"father"})
     },
     panduan(targetPath){
+      var app = storage.get("app")
       var userId = storage.get("userId")
       if (!userId) {
         this.$router.push({path:"login"})
@@ -270,7 +318,19 @@ if(userId!==null){
           if(newkey !== yanzheng){
             this.$router.push({path:"login"})
           }else{
-            this.$router.push({path:targetPath})
+            if (targetPath=="header") {
+              // 传参跳转
+              
+              if(app == 1){
+                this.$router.push({path:"headerNew"})
+              }else{
+                this.$router.push({path:"header"})
+              }
+             
+            }else{
+              this.$router.push({path:targetPath})
+            }
+            
           }
       }
 
@@ -280,6 +340,7 @@ if(userId!==null){
       // 判断是否登录
       this.panduan("details")
   	},
+
     chooseType(id){
       if(id == undefined){
         this.isActive0=true
@@ -314,18 +375,23 @@ if(userId!==null){
           pagesize:20
         },
         success: function (res) {
+          console.log(res)
           that.loading = true;
           if(res.code == 200){
             var details = res.data
             var detailaData =[]
             for (var i = 0; i < details.length; i++) {
+              
+              // 判断是否有用户对用户的评论
+              that.replayList=details[i].replylist
+              
                 if(details[i].headimg){
                   details[i].headimg =details[i].headimg 
                 }else{
                   details[i].headimg  ="../static/app.png"
                 }
               if(details[i].pasttime.length>11){
-                details[i].pasttime = details[i].pasttime.substr(0,11)
+                details[i].pasttime = details[i].pasttime.substr(0,8)
               }
               var msg = {}
               msg.headimg = details[i].headimg
@@ -338,6 +404,17 @@ if(userId!==null){
               msg.pinglun = details[i].pinglun
               msg.iszan = details[i].iszan
               msg.id = details[i].id
+              msg.replylist = details[i].replylist
+              
+
+              // 判断评论条数
+              if(details[i].replylist.length==0){
+                msg.replayListNone=false
+              }else{
+                msg.replayListNone=true
+              }
+
+             
               
               // 判断赞与否
               if(msg.iszan){
@@ -443,28 +520,22 @@ if(userId!==null){
       }, 2500);
     },
     tiaozhuanfangda(e){
-      this.mengcengImg = e
-      $('.mengcengImg').animate({height:"100%",width:"100%",top:"0",left:"0"}, 300)
+  
+      console.log(e)
+      this.lunboSrc = e
+      // this.mengcengImg = e
+       $('.mengcengImg').animate({height:"100%",width:"100%",top:"0",left:"0"}, 300)
       this.mengcengImgT=true
+
+   
     },
+
     jishi(){
-      var num = 0
-      this.jishinum = 0
-      var that = this
-      var interval = setTimeout(function () {
-          clearInterval(interval)
-          num=num+2
-          that.jishinum = num
-      }, 1000)
+
+        this.mengcengImgT=false
     },
-    xiaoshi(){
-        if(this.jishinum<2){
-          $('.mengcengImg').animate({height:"0%",width:"0%",top:"50%",left:"50%"}, 300)
-          setTimeout(() => {
-              this.mengcengImgT=false
-          }, 200);
-        }
-    },
+  
+  
     shuaxin(){
       $('html,body').animate({scrollTop: '0px'}, 800)
       setTimeout(() => {
@@ -475,6 +546,7 @@ if(userId!==null){
 
   },
   created(){
+
     var vm=this;
     window.onscroll=function(){
         if (document.documentElement.scrollTop>60) {
@@ -487,6 +559,7 @@ if(userId!==null){
 }
 </script>
 <style scoped >
+.ovfHiden{overflow: hidden;height: 100%;}
 .top{
   background-color: #4BC754;
   height:40px;
@@ -532,6 +605,8 @@ image[lazy=loading] {
   height:60px;
   display: flex;
   justify-content: flex-end;
+  padding-left: 60px;
+  padding-right: 20px;
 }
 .user div{display: inline-block;}
 .user-img{
@@ -545,6 +620,8 @@ image[lazy=loading] {
   color:#fff;
   line-height: 60px;
   font-size: 1rem;
+
+box-sizing: border-box;
 }
 .fenlei{
   padding:10px;
@@ -688,13 +765,32 @@ image[lazy=loading] {
   background-color: #000;
   height:0%;
 
-  text-align: center;
+  
 }
-.mengcengImg span{ display:inline-block; height:100%; vertical-align:middle;}  
-.mengcengImg img{
+.mengcengImgnei span{ display:inline-block; height:100%; vertical-align:middle;}  
+
+.mengcengImgnei{
+display: table-cell;
+        
+}
+.mengcengImgnei img{
   width: 100%;
   vertical-align:middle;
 
+}
+
+/*评论*/
+.replay-line{
+  display: flex;
+  
+}
+
+.replay{
+  padding:8px;
+  background-color: #F0F0F0;
+}
+.name-color{
+  color:#417AAF;
 }
 
 

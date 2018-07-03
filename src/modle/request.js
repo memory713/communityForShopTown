@@ -218,7 +218,8 @@ function calcMD5(str) { return binl2hex(coreMD5(str2binl(str))) }
 
 var _conf = {
     'api': 'http://api.emjiayuan.com/api.php',
-    'key': '81faee75bd269f0010b94bf54cd44345',
+    'key': '4d8feefe6a2f596d39bcbc10057fd788',
+         
 }
 
 
@@ -227,7 +228,7 @@ function request(action, method, requestHandler) {
     timestamp = timestamp / 1000
     var headers = {
         'method': method,
-        'platform': 'WX_XCX',
+        'platform': 'WAP',
         'time': timestamp
     };
 

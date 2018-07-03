@@ -12,16 +12,17 @@
             <mt-field  placeholder="这一刻的想法...(不少于6个字)" type="textarea" rows="8" v-model="introduction"></mt-field>
         </div>
         <input @change="fileChange($event)" type="file" id="upload_file" multiple style="display: none"/>
+
         <div class="add-img" ref="elememt" >
             <span class="font14" v-show="imgList.length" >图片(最多9张，还可上传<span v-text="9-imgList.length"></span>张)</span>
             <ul class="img-list">
+
                 <li v-for="(url,index) in imgList">
                     <img class="del"   src="../assets/shanchu.png" @click.stop="delImg(index)"/> 
                     <div class="img-chuang-div" >
                         <img :src="url.file.src" class="img-chuang" v-bind:style="{ height:item2Height+ 'px', width:item2Width + 'px' }" >
-                        
+                       <!--  <mt-progress :value="url.file.uploading" :bar-height="5" style="height:15px;"></mt-progress> -->
                     </div>
-
                 </li>
                 <img class="add" src="../assets/add.png" @click="chooseType" v-bind:style="{ height:item2Height-5+ 'px', width:item2Width-5+ 'px', }">
             </ul>
@@ -43,10 +44,13 @@ import imgSrc from '../modle/imgSrc.js'
 import { Toast } from 'mint-ui';
 import request from '../modle/request.js'
 import { Header } from 'mint-ui';
-import hexMD5 from '../modle/md5.js'
+import hexMD5 from '../modle/md5.js';
+import { Progress } from 'mint-ui';
+
+
 
 export default {
-    name: "Feedback",
+    name: 'Toast',
     data () {
         return {
             introduction:"",
@@ -60,6 +64,8 @@ export default {
             item2Height:80,
             item2Width:80,
             typeId:"",
+            progress:60,
+            newlimit:[]
             // active:true
         }
     
@@ -91,7 +97,10 @@ export default {
     for (let i = 0; i < files.length; i++) {
      //判断是否为文件夹
      if (files[i].type != '') {
+      
       this.fileAdd(files[i]);
+
+
      } else {
       //文件夹处理
       this.folders(fileList.items[i]);
@@ -115,19 +124,16 @@ export default {
      }
     });
    },
-   foldersAdd(entry) {
-    let _this = this;
-    entry.file(function (file) {
-     _this.fileAdd(file)
-    })
-   },
+   // foldersAdd(entry) {
+   //  let _this = this;
+   //  entry.file(function (file) {
+   //  nummmmmm =  _this.fileAdd(file,1)
+   //  })
+   // },
    fileAdd(file) {
-
      var widthCss = window.getComputedStyle(this.$refs.elememt).width;
       this.item2Width =(parseFloat(widthCss)-100) /4
       this.item2Height = this.item2Width
-
-
     if (this.limit !== undefined) this.limit--;
     if (this.limit !== undefined && this.limit < 0) return;
     //总大小
@@ -147,11 +153,12 @@ export default {
        let height = image.height;
        file.width = width;
        file.height = height;
-       _this.imgList.push({ file });
+       _this.newlimit.push("a")
       };
       image.src= file.src;
-
-     
+      
+      
+        _this.openLoading()
       // 上传图片
     request('POST','system.uploadImgFor64',
     {
@@ -160,8 +167,17 @@ export default {
       },
       success: function (res) {
         if(res.code == 200){
+          _this.openLoading()
             // res.data.imgurl
-            _this.aaa = _this.aaa.concat(res.data.imgurl)           
+            _this.aaa = _this.aaa.concat(res.data.imgurl)  
+            _this.imgList.push({ file });
+            // console.log("_this.imgList.length="+_this.imgList.length+"_this.newlimit.length="+_this.newlimit.length)
+            if(_this.imgList.length==_this.newlimit.length){
+            
+          _this.closeLoading()
+      
+            }
+
         }
       },
       fail: function () {
@@ -174,11 +190,26 @@ export default {
      }
     }
    },
+   openLoading(){
+        this.$loading('上传中...');
+        let self = this;
+        
+      },
+      closeLoading(){
+        this.$loading.close();
+        Toast({
+          message: '图片加载完毕',
+          iconClass: 'mintui mintui-success',
+          duration: 2000
+        });
+      },
    delImg(index) {
     var that = this
         this.size = this.size - this.imgList[index].file.size;//总大小
         this.imgList.splice(index, 1);
         if (this.limit !== undefined) this.limit = 9-this.imgList.length;
+
+       
         // 删除
     request('POST','system.deleteImg',
     {
@@ -190,6 +221,9 @@ export default {
         setTimeout(() => {
           instance.close();
         }, 2000);
+
+        that.aaa.splice(index, 1);
+        that.newlimit.splice(index, 1);
       },
       fail: function () {
         let instance = Toast('您的网络有误，请检查');
@@ -246,6 +280,8 @@ export default {
             instance.close();
             that.$router.push({path:"home"})
           }, 2000);
+        }else{
+          let instance = Toast(res.message);
         }
         
       },
@@ -298,6 +334,26 @@ export default {
 }
 </script>
 <style scoped>
+div.progressContainer{
+          height: 20px;
+          width: 96%;
+          border-radius: 10px;
+          background-color: #ddd;
+          margin-left: 2%;
+}
+div.progress{
+            background-color: #1C8DE0;
+            border-radius: 10px;
+            height:20px;
+            line-height: 20px;
+}
+b{
+              color:#fff;
+              font-weight: 100;
+              font-size: 12px;
+              position:absolute;
+        left:40%; 
+}
 .search_input::-webkit-input-placeholder{
     color:#CFCFCF;
 }

@@ -6,15 +6,29 @@ import clipper from '../static/clipper'
 
 Vue.config.productionTip = false
 
+var VueTouch = require('vue-touch')
+Vue.use(VueTouch, {name: 'v-touch'})
+// 全局引入Toast
+import './components/Toast/toast.css';
+import Toast from './components/Toast/index';
+
 // UI
-import 'mint-ui/lib/style.css'
+import 'mint-ui/lib/style.css';
 import Mint from 'mint-ui';
 Vue.use(Mint);
 Vue.use(VueResource)
 Vue.use(VueRouter)
 Vue.use(clipper)
+
+
+
+Vue.use(Toast);
 // 创建组建
 import Home from './components/Home.vue'
+import HeaderNew from './components/HeaderNew.vue'
+import todoListItem from './components/todoListItem.vue'
+
+
 import Header from './components/Header.vue'
 import Other from './components/Other.vue'
 import Login from './components/Login.vue'
@@ -33,17 +47,19 @@ Vue.use(wcView);
 
 // 配置路由
  const routes = [
-	{ path: '/home', component: Home },
-	{ path: '/header', component: Header },
-	{ path: '/other', component: Other },
-	{ path: '/login', component: Login },
-	{ path: '/details', component: Details },
-	{ path: '/pinglun:aid', component: Pinglun },
-	{ path: '/register', component: Register },
-	{ path: '/find', component: Find },
-	{ path: '/father', component: father },
-	{ path: '/BigImg', component: BigImg },
-	{ path: '/HeaderChange', component: HeaderChange },
+	{ path: '/home', component: Home ,name:"home"},
+	{ path: '/todoListItem', component: todoListItem ,name:"todoListItem"},
+	{ path: '/header', component: Header ,name:"header"},
+	{ path: '/other', component: Other ,name:"other"},
+	{ path: '/login', component: Login ,name:"login"},
+	{ path: '/details', component: Details ,name:"details"},
+	{ path: '/pinglun:aid', component: Pinglun ,name:"pinglun"},
+	{ path: '/register', component: Register ,name:"register"},
+	{ path: '/find', component: Find ,name:"find"},
+	{ path: '/father', component: father ,name:"father"},
+	{ path: '/BigImg', component: BigImg ,name:"BigImg"},
+	{ path: '/HeaderNew', component: HeaderNew ,name:"HeaderNew"},
+	{ path: '/HeaderChange', component: HeaderChange ,name:"HeaderChange"},
 	{ path: '*', redirect: '/Home' }   /*默认跳转路由*/
 ]
 // 实例化VueRouter

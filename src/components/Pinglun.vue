@@ -1,6 +1,6 @@
 <template>
 	<div>
-	<div class="ditails"  >
+	<div class="ditails-ping"  >
         <div class="ditails-box">
           <div class="box-left">
             <img :src="list.headimg" :onerror="logo">
@@ -209,6 +209,7 @@ export default {
   	getData(){
   		var that = this
 	  	var aid = this.$route.params.aid
+	  	
 	  	var userId = storage.get("userId")
 	  	this.userId = userId
 	  	if(!userId){
@@ -311,7 +312,7 @@ export default {
 </script>
 <style scoped >
 
-.ditails{
+.ditails-ping{
   padding:20px;
   padding-bottom:10px;
 }
@@ -371,15 +372,15 @@ export default {
   padding-right:5px;
   padding-bottom:5px;
 }
-
+.name-color{
+	color:#417AAF;
+}
 
 .replay-line{
 	display: flex;
 	
 }
-.name-color{
-	color:#417AAF;
-}
+
 .replay{
 	padding:8px;
 	background-color: #F0F0F0;

@@ -1,30 +1,43 @@
 <template>
 	<div>
 		<div class="top">
-			<div class="top-middle" id="bodya">
-				<img :src="headimgZ" id="img" @click="dianji()" :onerror="logo" >
-				<div class="top-word">点击修改头像</div>
-      <input type="file" accept="image/png,image/jpg,image/jpeg" @change="change($event)" id="upload_file" style="display:none;">
-				
-
+			<div class="top-middle" id="" >
+				<img :src="headimgZ" id="img"  :onerror="logo" >
+				<!-- <div class="top-word">点击修改头像</div> -->
 			</div>
 		</div>
-		<div class="body22">
-			<div class="input">
+		<div class="body">
+		<!-- 	<div class="mine" @click="tiao()">
+        <img src="../assets/name0.png" style="height:20px;width:20px;margin-right:10px;">
 				<div class="body-left">用户名</div>
 				<div class="body-right">{{username}}</div>
+        <img src="../assets/right.png" class="right">
 			</div>
-			<div class="input">
+			<div class="mine" @click="tiao()">
+        <img src="../assets/name.png" style="height:20px;width:20px;margin-right:10px;">
 				<div class="body-left">昵称</div>
-				<input type="text" name="" class="body-right" v-model="value"   maxlength=8 > 
-			</div>
-   
+				<div class="body-right">{{value}}</div>
+        <img src="../assets/right.png" class="right">
+			</div> -->
+          <div class="myTie mine" @click="mytie()">
+            <div class="mine-nei">
+              <img src="../assets/tieziM.png">
+              <div>我的帖子</div>
+            </div>
+            <img src="../assets/right.png" class="right">
+          </div>
+        <div class="myMes mine" style="border-right:none;" @click="myMessage()">
+          <div class="mine-nei" >
+            <img src="../assets/messageM.png">
+            <div>我的消息</div>
+          </div>
+          <img src="../assets/right.png" class="right">
+        </div>
 		</div>
-    <div style="height:30px;line-height:30px;font-size:0.7rem;color:#ccc;margin-left:20px;">*昵称请少于八个字</div>
 
-		<div class="baocun" @click="baocun()">
-			<div style="border:none;">保存</div>
-		</div>
+	<!-- 	<div class="tuichu" @click="tuichu()">
+			<div>退出登录</div>
+		</div> -->
 
 		
         
@@ -56,6 +69,7 @@ import hexMD5 from '../modle/md5.js'
   },
   mounted(){  
       var that  = this   
+
      var userId = storage.get("userId")
       if(!userId){
         this.$router.push({path:"login"})
@@ -78,7 +92,7 @@ import hexMD5 from '../modle/md5.js'
           }else{
             that.headimgZ=res.data.headimg
           }
-          that.value2=res.data.nickname
+          
           that.value=res.data.nickname
           that.username=res.data.username
           that.userId = res.data.id
@@ -93,85 +107,27 @@ import hexMD5 from '../modle/md5.js'
       })
   },
   methods: {
-    dianji(){
-      document.getElementById('upload_file').click();
+     tuichu(){
+      // 退出登录
+      storage.set("userId",null)
+      this.$router.push({path:"home"})
+     },
+     tiao(){
+      this.$router.push({path:"HeaderChange"})
+    },
+    myMessage(){
+      this.$router.push({path:"father"})
     },
 
-    change( event ) {
-        let image = document.getElementById('img'); //预览对象
-        this.clip(event , {
-          resultObj : image,
-          aspectRatio : 1
-        })
-    },
     mytie(){
+      this.$router.push({path:"BigImg"})
     },
-    baocun(){
-      var aaa = document.getElementById('img')
-      
-      var that = this
-       // 上传图片
-    request('POST','system.uploadImgFor64',
-    {
-      params: {
-        imagedata:aaa.src
-      },
-      success: function (res) {
-      if(res.data == undefined){
-        var aaa =""
-      }else{
-        var aaa = res.data.imgurl
-      }
-      if((that.value2==that.value)&&(aaa.length==0)){
-        let instance = Toast("请修改资料");
-        setTimeout(() => {
-          instance.close();
-        }, 2000);
+    
+  }	
 
-      }else{
-
-        // if(res.code == 200){
-          // 保存用户资料接口
-            // res.data.imgurl
-            request('POST','user.editUserInfo',
-            {
-              params: {
-                userid:that.userId,
-                password:"",
-                nickname:that.value,
-                headimg:aaa
-              },
-              success: function (res) {
-                let instance = Toast(res.message);
-                setTimeout(() => {
-                  instance.close();
-                  that.$router.push({path:"home"})
-                }, 2000);
-              },
-              fail: function () {
-                let instance = Toast('您的网络有误，请检查');
-                setTimeout(() => {
-                  instance.close();
-                }, 2000);
-              },
-            })
-        }
-      },
-      fail: function () {
-        let instance = Toast('您的网络有误，请检查');
-        setTimeout(() => {
-          instance.close();
-        }, 2000);
-      },
-    })
-      
-    }
-  	
-
-  }
  }
 </script>
-<style>
+<style >
 input{
 	border:none;
 	outline:none;
@@ -185,7 +141,7 @@ input{
 	border-bottom: 10px solid #F4F4F4;
 }
 .top-middle{
-	height:100px;
+	height:80px;
 	text-align: center;
 
 }
@@ -200,13 +156,15 @@ input{
 	color:#808080;
 	margin-top:10px;
 }
-.body22{
+.body{
 	padding:20px;
+  padding-bottom: 0px;
 	padding-top:0px;
 
 	box-sizing: border-box;
 }
 .input{
+  display: flex;
 	padding-top:15px;
 	padding-bottom:15px;
 	box-sizing: border-box;
@@ -220,24 +178,25 @@ input{
 	width:30%;
 }
 .body-right{
-	width:65%;
+	width:55%;
 	font-size: 0.8rem;
 }
-.baocun{
+.tuichu{
 	width:100%;
 	position:fixed;
 	bottom:20px;
 	padding:20px;
 	box-sizing: border-box;
 }
-.baocun div{
-	background-color: #4BC653;
+.tuichu div{
+	/*background-color: #4BC653;*/
 	width:100%;
 	height:50px;
 	line-height: 50px;
 	text-align: center;
-	color:#fff;
 	border-radius: 5px;
+  color:#808080;
+  border:1px solid #808080;
 }
 
 
@@ -653,6 +612,40 @@ input[type='file']{
 .cropper-disabled .cropper-point {
   cursor: not-allowed;
 }
+.mine-nei{
+  display: flex;
+}
+.mine-nei img{
+  height:20px;
+  width:20px;
+  margin-right:10px;
+}
+.mine{
+  display: flex;
+  justify-content: space-between;
+  padding:8px;
+  padding-top:15px;
+  padding-bottom:15px;
+border-bottom: 1px solid #D9D9D9;
+}
+.bottom{
+  display: flex;
 
-
+  box-sizing: border-box;
+  
+  background-color: #fff;
+  padding:5px;
+  
+}
+.right{
+  margin-top:2.5px;
+  height:15px;
+  width:10px;
+}
+/*.shuxian{
+  height:80px;
+  width:1px;
+  background-color: #ccc;
+}
+	*/
 </style>

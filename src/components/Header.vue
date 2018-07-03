@@ -6,7 +6,7 @@
 				<!-- <div class="top-word">点击修改头像</div> -->
 			</div>
 		</div>
-		<div class="body">
+		<div class="body22">
 			<div class="mine" @click="tiao()">
         <img src="../assets/name0.png" style="height:20px;width:20px;margin-right:10px;">
 				<div class="body-left">用户名</div>
@@ -155,7 +155,7 @@ input{
 	color:#808080;
 	margin-top:10px;
 }
-.body{
+.body22{
 	padding:20px;
   padding-bottom: 0px;
 	padding-top:0px;
